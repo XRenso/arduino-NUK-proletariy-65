@@ -1,26 +1,35 @@
-#include <QuadDisplay2.h>
+#include <LiquidCrystalRus.h>
 #include <Wire.h>
 #include <TroykaDHT.h>
 #include <TroykaRTC.h>
 #define LEN_TIME 12
 RTC clock;
 char time[LEN_TIME];
-QuadDisplay qd(8);
+LiquidCrystalRus lcd(12, 10, 11, 5, 4, 3, 2);
 DHT dht(9, DHT11);
 void setup() {
-  qd.begin();
+  lcd.begin(20, 4);
   dht.begin();
   clock.begin();
   clock.set(__TIMESTAMP__);
+  lcd.setCursor(7, 1);
+  lcd.print("\x42\x4F\x52\x43\x48");
+  lcd.setCursor(5, 2);
+  lcd.print("НУК ВЕР. 1");
+  delay(2000);
+  lcd.clear();
 }
 
 void loop() {
   clock.read();
   dht.read();
-  qd.displayTemperatureC(dht.getTemperatureC());
-  delay(5000);
-  qd.displayHumidity(dht.getHumidity());
-  delay(5000);
-  qd.displayScore(clock.getHour(), clock.getMinute(), true);
-  delay(5000);
+  lcd.setCursor(6,0);
+  lcd.print(clock.getHour());
+  lcd.print(":");
+  lcd.print(clock.getMinute());
+  lcd.print(":");
+  lcd.print(clock.getSecond());
+  lcd.setCursor(1,2);
+  lcd.print(dht.getTemperatureC());
+  lcd.print("\x99""C");
 }
