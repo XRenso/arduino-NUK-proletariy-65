@@ -5,6 +5,7 @@
 #define LEN_TIME 12
 RTC clock;
 char time[LEN_TIME];
+Barometer barometer;
 LiquidCrystalRus lcd(12, 10, 11, 5, 4, 3, 2);
 DHT dht(9, DHT11);
 void setup() {
