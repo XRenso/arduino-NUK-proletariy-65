@@ -31,9 +31,13 @@ void setup() {
 
 void loop() {
   ints();
+  lcd.setCursor(6,0);
   times();
+  lcd.setCursor(3,1);
   temps();
+  lcd.setCursor(13,1);
   humi();
+  lcd.setCursor(1,2);
   bars();
 }
 void ints (){
@@ -47,7 +51,6 @@ void ints (){
   dht.read();
 }
 void times () {
-  lcd.setCursor(6,0);
   lcd.print(hour);
   lcd.print(":");
   lcd.print(minute);
@@ -55,17 +58,14 @@ void times () {
   lcd.print(seconds);
 }
 void temps (){
-  lcd.setCursor(3,1);
   lcd.print(temp);
   lcd.print("\x99""C");
 }
 void humi (){
-  lcd.setCursor(13,1);
   lcd.print(hum);
   lcd.print("\x25");
 }
 void bars () {
-  lcd.setCursor(1,2);
   lcd.print(bar);
   lcd.print("мм рт. ст.");
 }
