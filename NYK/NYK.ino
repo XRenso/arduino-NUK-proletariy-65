@@ -7,6 +7,12 @@
 RTC clock;
 Barometer barometer;
 char time[LEN_TIME];
+int bar;
+int temp;
+int hum;
+int hour;
+int seconds;
+int minute;
 LiquidCrystalRus lcd(12, 10, 11, 5, 4, 3, 2);
 DHT dht(9, DHT11);
 void setup() {
@@ -24,26 +30,41 @@ void setup() {
 }
 
 void loop() {
-  int bar = barometer.readPressureMillimetersHg();
-  int temp = dht.getTemperatureC();
-  int hum = dht.getHumidity();
-  int hour = clock.getHour();
-  int minute = clock.getMinute();
-  int seconds = clock.getSecond();
+  ints();
+  times();
+  temps();
+  humi();
+  bars();
+}
+void ints (){
+  bar = barometer.readPressureMillimetersHg();
+  temp = dht.getTemperatureC();
+  hum = dht.getHumidity();
+  hour = clock.getHour();
+  minute = clock.getMinute();
+  seconds = clock.getSecond();
   clock.read();
   dht.read();
+}
+void times () {
   lcd.setCursor(6,0);
   lcd.print(hour);
   lcd.print(":");
   lcd.print(minute);
   lcd.print(":");
   lcd.print(seconds);
+}
+void temps (){
   lcd.setCursor(3,1);
   lcd.print(temp);
   lcd.print("\x99""C");
+}
+void humi (){
   lcd.setCursor(13,1);
   lcd.print(hum);
   lcd.print("\x25");
+}
+void bars () {
   lcd.setCursor(1,2);
   lcd.print(bar);
   lcd.print("мм рт. ст.");
