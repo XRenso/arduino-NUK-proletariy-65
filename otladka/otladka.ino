@@ -12,16 +12,14 @@ void setup() {
   dht.begin();
   clock.begin();
   clock.set(__TIMESTAMP__);
-  lcd.setCursor(7, 1);
-  lcd.print("\x42\x4F\x52\x43\x48");
-  lcd.setCursor(5, 2);
-  lcd.print("НУК ВЕР. 1");
-  delay(2000);
-  lcd.clear();
+  startScreen();
 }
+
+
 
 void loop() {
   Time();
+  lcd.setCursor(1,2);
   Temperature();
 }
 
@@ -37,12 +35,21 @@ void Temperature()
 
 void Time()
 {
-   clock.read();
+  clock.read();
   lcd.setCursor(6,0);
   lcd.print(clock.getHour());
   lcd.print(":");
   lcd.print(clock.getMinute());
   lcd.print(":");
   lcd.print(clock.getSecond());
-  lcd.setCursor(1,2);
+}
+
+void startScreen()
+{
+  lcd.setCursor(7, 1);
+  lcd.print("\x42\x4F\x52\x43\x48");
+  lcd.setCursor(5, 2);
+  lcd.print("НУК ВЕР. 1");
+  delay(2000);
+  lcd.clear();
 }
