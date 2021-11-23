@@ -44,7 +44,7 @@ void loop() {
    Curs(3,1);
    Temperature();
    Curs(13,1);
-   humi();
+   Hum();
    Curs(1,2);
    bars();
    dista();
@@ -90,7 +90,7 @@ void Time()
 
 
 
-void humi (){
+void Hum (){
   lcd.print(hum);
   lcd.print("\x25");
 }
