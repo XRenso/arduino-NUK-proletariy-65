@@ -46,8 +46,9 @@ void loop() {
    Curs(13,1);
    Hum();
    Curs(1,2);
-   bars();
-   dista();
+   Bar();
+   Curs(1,3);
+   Dist();
    delay(29);
 }
 
@@ -70,7 +71,7 @@ void Temperature()
   lcd.print("\x99""C");
 }
 
-void bars () {
+void Bar () {
   lcd.print(bar);
   lcd.print("мм рт. ст.");
 }
@@ -104,8 +105,7 @@ void startScreen()
   delay(2000);
   lcd.clear();
 }
-void dista () {
-  Curs(1,3);
+void Dist () {
   lcd.print(dist);
   lcd.print("см");
 }
