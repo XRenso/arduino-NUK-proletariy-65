@@ -6,31 +6,22 @@
 #include <Wire.h>
 #include <TroykaDHT.h>
 #include <TroykaRTC.h>
-#define LEN_TIME 12
+#define LEN_TIME       12
 #define TRIGGER_PIN    12
 #define ECHO_PIN       13
 #define MAX_DISTANCE   500
 #define PIN_MQ9        A1
 #define PIN_MQ9_HEATER 1
-#define vppin A0
+#define vppin          A0
 RTC clock;
 Barometer barometer;
 TroykaButton bl(8);
 TroykaButton br(6);
 MQ9 mq9(PIN_MQ9, PIN_MQ9_HEATER);
 char time[LEN_TIME];
-int bar;
-int temp;
-int hum;
-String timeStr;
-String dateStr;
-String weekDayStr;
-int dist;
+int temp,hum,bar,lpg,meth,CM,VP,dist;
+String timeStr,dateStr,weekDayStr;
 int mode=0;
-int lpg;
-int meth;
-int CM;
-int VP;
 LiquidCrystalRus lcd( 11, 10, 5, 4, 3, 2);
 DHT dht(9, DHT11);
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
