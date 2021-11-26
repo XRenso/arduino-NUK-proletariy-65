@@ -46,7 +46,7 @@ void Curs(int weight, int hight)
 
 
 void loop() {
-   ints();
+   init();
    Curs(6,0);
    Time(); 
    Curs(3,1);
@@ -60,7 +60,7 @@ void loop() {
    delay(29);
 }
 
-void ints ()
+void init ()
 {
   delay(500);
   dist = sonar.ping_cm();
@@ -68,7 +68,7 @@ void ints ()
   bar = barometer.readPressureMillimetersHg();
   delay(500);
   temp = dht.getTemperatureC();
-  hum = dht.getHumidity();
+   hum = dht.getHumidity();
   delay(500);
   hour = clock.getHour();
   minute = clock.getMinute();
