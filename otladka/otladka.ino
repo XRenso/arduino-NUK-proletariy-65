@@ -46,21 +46,31 @@ void Curs(int weight, int hight)
 
 
 void loop() {
-   init();
-   Curs(6,0);
-   Time(); 
+   INIT(); 
+   
+   Time(1); 
+   
    Curs(3,1);
+   
    Temperature();
+   
    Curs(13,1);
+   
    Hum();
+   
+   
    Curs(1,2);
+   
+   
    Bar();
+   
    Curs(1,3);
+   
    Dist();
    delay(29);
 }
 
-void init ()
+void INIT ()
 {
   delay(500);
   dist = sonar.ping_cm();
@@ -95,10 +105,11 @@ void Bar () {
 
 
 
-void Time()
+void Time(int isChangeCurs)
 {
   delay(500);
-  Curs(6,0);
+  if (isChangeCurs == 1)
+   { Curs(6,0); }
   lcd.print(hour);
   lcd.print(":");
   lcd.print(minute);
