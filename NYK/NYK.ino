@@ -13,6 +13,7 @@
 #define PIN_MQ9        A1
 #define PIN_MQ9_HEATER 1
 #define vppin          A0
+#define zoomer_pin     0
 RTC clock;
 Barometer barometer;
 TroykaButton bl(8);
@@ -33,6 +34,7 @@ void setup() {
   bl.begin();
   br.begin();
   mq9.cycleHeat();
+  pinMode(zoomer_pin, OUTPUT);
   //clock.set(__TIMESTAMP__);
   lcd.setCursor(7, 1);
   lcd.print("\x42\x4F\x52\x43\x48");
