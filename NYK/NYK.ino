@@ -19,7 +19,7 @@ TroykaButton bl(8);
 TroykaButton br(6);
 MQ9 mq9(PIN_MQ9, PIN_MQ9_HEATER);
 char time[LEN_TIME];
-int temp,hum,bar,lpg,meth,CM,VP,dist;
+int temp,hum,bar,VP,dist;
 String timeStr,dateStr,weekDayStr;
 int mode=0;
 LiquidCrystalRus lcd( 11, 10, 5, 4, 3, 2);
@@ -33,7 +33,7 @@ void setup() {
   bl.begin();
   br.begin();
   mq9.cycleHeat();
-  clock.set(__TIMESTAMP__);
+  //clock.set(__TIMESTAMP__);
   lcd.setCursor(7, 1);
   lcd.print("\x42\x4F\x52\x43\x48");
   lcd.setCursor(4, 2);
@@ -58,21 +58,15 @@ void loop() {
   humi(2,2);
   bars(12,1);
   dista(12,2);
-  vp(1,3);
+  vp(0,3);
   }
   if (mode == 1){
-    LPG(0,0);
-    Cm(0,1);
-    Meth(0,2);
+    gass(0,0);
     delay(29);
   }
-  mq9.cycleHeat();
 }
 void ints (){
   VP = analogRead(vppin);
-  CM = mq9.readCarbonMonoxide();
-  meth = mq9.readMethane();
-  lpg = mq9.readLPG();
   dist = sonar.ping_cm();
   bar = barometer.readPressureMillimetersHg();
   temp = dht.getTemperatureC();
@@ -109,53 +103,53 @@ void dista (int cur, int cur1) {
   lcd.print(dist);
   lcd.setCursor(cur + 2,cur1);
   lcd.print("см");
+  delay(1000);
 }
-void LPG (int cur, int cur1){
-  
-  lcd.setCursor(cur, cur1);
-  lcd.print("\x4c\x50\x47\x3A");
-  if (mq9.atHeatCycleEnd()) {
-  lcd.print(lpg);
-  lcd.print("\x50\x50\x4d");
-  }else{
-    lcd.print(" нагрев, погоди");
-  }
-}void Cm (int cur, int cur1){
-  
-  lcd.setCursor(cur, cur1);
-  lcd.print("\x43\x4d\x3a");
-  if (mq9.atHeatCycleEnd()) {
-  lcd.print(CM);
-  lcd.print("\x50\x50\x4d");
-  }else{
-    lcd.print(" нагрев, погоди");
-  }
-}
-void Meth (int cur, int cur1){
-  
-  lcd.setCursor(cur, cur1);
-  lcd.print("\x4d\x65\x74\x68\x3A");
-  if (mq9.atHeatCycleEnd()) {
-  lcd.print(meth);
-  lcd.print("\x50\x50\x4d");
-  }else{
-    lcd.print(" нагрев, погоди");
-  }
+void gass (int cur, int cur1){
+   if (!mq9.isCalibrated()) {
+    lcd.setCursor(cur,cur1);
+    lcd.print("калибровка...");
+    lcd.setCursor(cur,cur1+1);
+    lcd.print("подождите");
+    delay(5000);
+    mq9.calibrate();
+    mq9.cycleHeat();
+    lcd.clear();
+   }
+   if (mq9.isCalibrated()) {
+    lcd.setCursor(cur,cur1);
+    lcd.print("\x4c\x50\x47\x3a");
+    lcd.print(mq9.readLPG());
+    lcd.print(" \x70\x70\x6d");
+    lcd.setCursor(cur,cur1+1);
+    lcd.print("\x4D\x65\x74\x68\x3a");
+    lcd.print(mq9.readMethane());
+    lcd.print(" \x70\x70\x6d");
+    lcd.setCursor(cur,cur1+2);
+    lcd.print("\x43\x4d\x3a");
+    lcd.print(mq9.readCarbonMonoxide());
+    lcd.print(" \x70\x70\x6d");
+    delay(100);
+    mq9.cycleHeat();
+   }
 }
 void vp (int cur, int cur1){
   lcd.setCursor(cur,cur1);
-  lcd.print("ВП: ");
+  lcd.print("ВП:");
   lcd.print(VP);
   if (VP >= 0 && VP <= 300) {
     lcd.setCursor(cur+7,cur1);
     lcd.print("сухая почва");
+    lcd.clear();
   }
   else if (VP >= 300 && VP <= 600){
     lcd.setCursor(cur+7,cur1);
     lcd.print("влажная почва");
+    lcd.clear();
   }
   else if (VP >= 600 && VP <= 750){
     lcd.setCursor(cur+7,cur1);
     lcd.print("датчик в воде");
+    lcd.clear();
   }
 }
