@@ -22,10 +22,9 @@ int hum;
 int hour;
 int seconds;
 int minute;
-int dist;
-int mode=0;
+int mode = 0;
 int max_mode = 1;
-
+int VP;
 
 
 RTC clock;
@@ -61,7 +60,24 @@ void Curs(int weight, int hight)
 void loop() {
    INIT(); 
 
-  if(bl.isClick() && mode == 0 || mode != 0 && mode != max_mode )
+   Screen_State(2);
+   delay(29);
+   changeScreenState();
+  
+   
+   delay(29);
+}
+
+
+
+void Screen_State(int getORchange)
+{
+  if(getORchange == 1)
+  {
+    return mode;
+  }
+  else{
+    if(bl.isClick() && mode == 0 || mode != 0 && mode != max_mode )
   {
     mode++;
     lcd.clear();
@@ -84,36 +100,44 @@ void loop() {
     mode = max_mode;
     lcd.clear();
   }
-
-
-
-   
-   Time(1); 
-   
-   Curs(3,1);
-   
-   Temperature();
-   
-   Curs(13,1);
-   
-   Hum();
-   
-   
-   Curs(1,2);
-   
-   
-   Bar();
-   
-   Curs(1,3);
-   
-   Dist();
-   delay(29);
+  }
 }
+
+
+
+
+void changeScreenState()
+{
+  switch(mode){
+    case 0:
+       Time(1); 
+       
+       Curs(3,1);
+       
+       Temperature();
+       
+       Curs(13,1);
+       
+       Hum();
+       
+       Curs(1,2);
+       
+       Bar();
+
+       vp(0,3);
+       
+    case 1:
+        gas(0,0);
+        delay(29);      
+      
+  }
+}
+
+
 
 void INIT ()
 {
-  delay(500);
-  dist = sonar.ping_cm();
+  VP = analogRead(vppin);
   delay(500);
   bar = barometer.readPressureMillimetersHg();
   delay(500);
@@ -125,6 +149,8 @@ void INIT ()
   seconds = clock.getSecond();
   clock.read();
   dht.read();
+  bl.read();
+  br.read();
 }
 
 
@@ -175,8 +201,55 @@ void startScreen()
   delay(2000);
   lcd.clear();
 }
-void Dist () {
-  delay(500);
-  lcd.print(dist);
-  lcd.print("см");
+
+
+
+void gas (int cur, int cur1){
+   if (!mq9.isCalibrated()) {
+    lcd.setCursor(cur,cur1);
+    lcd.print("калибровка...");
+    lcd.setCursor(cur,cur1+1);
+    lcd.print("подождите");
+    delay(5000);
+    mq9.calibrate();
+    mq9.cycleHeat();
+    lcd.clear();
+   }
+   if (mq9.isCalibrated()) {
+    lcd.setCursor(cur,cur1);
+    lcd.print("\x4c\x50\x47\x3a");
+    lcd.print(mq9.readLPG());
+    lcd.print(" \x70\x70\x6d");
+    lcd.setCursor(cur,cur1+1);
+    lcd.print("\x4D\x65\x74\x68\x3a");
+    lcd.print(mq9.readMethane());
+    lcd.print(" \x70\x70\x6d");
+    lcd.setCursor(cur,cur1+2);
+    lcd.print("\x43\x4d\x3a");
+    lcd.print(mq9.readCarbonMonoxide());
+    lcd.print(" \x70\x70\x6d");
+    delay(100);
+    mq9.cycleHeat();
+   }
+}
+
+void vp (int cur, int cur1){
+  lcd.setCursor(cur,cur1);
+  lcd.print("ВП:");
+  lcd.print(VP);
+  if (VP >= 0 && VP <= 300) {
+    lcd.setCursor(cur+7,cur1);
+    lcd.print("сухая почва");
+    lcd.clear();
+  }
+  else if (VP >= 300 && VP <= 600){
+    lcd.setCursor(cur+7,cur1);
+    lcd.print("влажная почва");
+    lcd.clear();
+  }
+  else if (VP >= 600 && VP <= 750){
+    lcd.setCursor(cur+7,cur1);
+    lcd.print("датчик в воде");
+    lcd.clear();
+  }
 }
