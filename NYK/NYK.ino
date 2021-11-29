@@ -33,8 +33,8 @@ void setup() {
   //clock.set(__TIMESTAMP__);
   lcd.setCursor(7, 1);
   lcd.print("\x42\x4F\x52\x43\x48");
-  lcd.setCursor(4, 2);
-  lcd.print("НУК ВЕР. 1,5");
+  lcd.setCursor(5, 2);
+  lcd.print("НУК ВЕР. 2");
   tone(zoomer_pin, 400, 200);
   delay(200);
   tone(zoomer_pin, 600, 200);
