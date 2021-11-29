@@ -1,14 +1,18 @@
+#include <TroykaMQ.h>
+#include <TroykaButton.h>
 #include <NewPing.h>
 #include <TroykaIMU.h>
 #include <LiquidCrystalRus.h>
 #include <Wire.h>
 #include <TroykaDHT.h>
 #include <TroykaRTC.h>
+
 #define LEN_TIME 12
 #define TRIGGER_PIN  12
 #define ECHO_PIN     13
-#define MAX_DISTANCE 500
-
+#define PIN_MQ9        A1
+#define PIN_MQ9_HEATER 1
+#define vppin          A0
 
 
 char time[LEN_TIME];
@@ -19,13 +23,18 @@ int hour;
 int seconds;
 int minute;
 int dist;
+int mode=0;
+int max_mode = 1;
+
+
 
 RTC clock;
 Barometer barometer;
 LiquidCrystalRus lcd(12, 10, 11, 5, 4, 3, 2);
 DHT dht(9, DHT11);
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
-
+TroykaButton bl(8);
+TroykaButton br(6);
+MQ9 mq9(PIN_MQ9, PIN_MQ9_HEATER);
 
 
 
@@ -35,6 +44,10 @@ void setup() {
   clock.begin();
   clock.set(__TIMESTAMP__);
   startScreen();
+  barometer.begin();
+  bl.begin();
+  br.begin();
+   mq9.cycleHeat();
 }
 
 
@@ -47,6 +60,33 @@ void Curs(int weight, int hight)
 
 void loop() {
    INIT(); 
+
+  if(bl.isClick() && mode == 0 || mode != 0 && mode != max_mode )
+  {
+    mode++;
+    lcd.clear();
+  }
+  
+  else if (bl.isClick() && mode == max_mode)
+  {
+    mode = 0;
+    lcd.clear();
+  }
+  
+  else if(br.isClick() && mode == max_mode || mode != 0 && mode != 0 )
+  {
+    mode--;
+    lcd.clear();
+  }
+  
+  else if (bl.isClick() && mode == 0)
+  {
+    mode = max_mode;
+    lcd.clear();
+  }
+
+
+
    
    Time(1); 
    
