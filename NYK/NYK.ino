@@ -1,19 +1,15 @@
 #include <TroykaMQ.h>
 #include <TroykaButton.h>
-#include <NewPing.h>
 #include <TroykaIMU.h>
 #include <LiquidCrystalRus.h>
 #include <Wire.h>
 #include <TroykaDHT.h>
 #include <TroykaRTC.h>
 #define LEN_TIME       12
-#define TRIGGER_PIN    12
-#define ECHO_PIN       13
-#define MAX_DISTANCE   500
 #define PIN_MQ9        A1
 #define PIN_MQ9_HEATER 1
 #define vppin          A0
-#define zoomer_pin     0
+#define zoomer_pin     12
 RTC clock;
 Barometer barometer;
 TroykaButton bl(8);
@@ -25,7 +21,6 @@ String timeStr,dateStr,weekDayStr;
 int mode=0;
 LiquidCrystalRus lcd( 11, 10, 5, 4, 3, 2);
 DHT dht(9, DHT11);
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 void setup() {
   lcd.begin(20, 4);
   dht.begin();
@@ -40,6 +35,11 @@ void setup() {
   lcd.print("\x42\x4F\x52\x43\x48");
   lcd.setCursor(4, 2);
   lcd.print("НУК ВЕР. 1,5");
+  tone(zoomer_pin, 400, 200);
+  delay(200);
+  tone(zoomer_pin, 600, 200);
+  delay(200);
+  tone(zoomer_pin, 800, 200);
   delay(2000);
   lcd.clear();
 }
@@ -48,28 +48,27 @@ void loop() {
   ints();
   if (bl.isClick() && mode == 1){
     mode = 0;
+    tone(zoomer_pin, 500, 100);
     lcd.clear();
   }if (br.isClick() && mode == 0){
     mode = 1;
+    tone(zoomer_pin, 500, 100);
     lcd.clear();
   }
   
   if(mode == 0){
   times(0,0);
   temps(2,1);
-  humi(2,2);
-  bars(12,1);
-  dista(12,2);
+  humi(12,1);
+  bars(2,2);
   vp(0,3);
   }
   if (mode == 1){
     gass(0,0);
-    delay(29);
   }
 }
 void ints (){
   VP = analogRead(vppin);
-  dist = sonar.ping_cm();
   bar = barometer.readPressureMillimetersHg();
   temp = dht.getTemperatureC();
   hum = dht.getHumidity();
@@ -98,14 +97,7 @@ void humi (int cur, int cur1){
 void bars (int cur, int cur1) {
   lcd.setCursor(cur,cur1);
   lcd.print(bar);
-  lcd.print("мм");
-}
-void dista (int cur, int cur1) {
-  lcd.setCursor(cur,cur1);
-  lcd.print(dist);
-  lcd.setCursor(cur + 2,cur1);
-  lcd.print("см");
-  delay(1000);
+  lcd.print("мм рт. ст.");
 }
 void gass (int cur, int cur1){
    if (!mq9.isCalibrated()) {
@@ -131,7 +123,6 @@ void gass (int cur, int cur1){
     lcd.print("\x43\x4d\x3a");
     lcd.print(mq9.readCarbonMonoxide());
     lcd.print(" \x70\x70\x6d");
-    delay(100);
     mq9.cycleHeat();
    }
 }
@@ -142,16 +133,13 @@ void vp (int cur, int cur1){
   if (VP >= 0 && VP <= 300) {
     lcd.setCursor(cur+7,cur1);
     lcd.print("сухая почва");
-    lcd.clear();
   }
   else if (VP >= 300 && VP <= 600){
     lcd.setCursor(cur+7,cur1);
     lcd.print("влажная почва");
-    lcd.clear();
   }
   else if (VP >= 600 && VP <= 750){
     lcd.setCursor(cur+7,cur1);
     lcd.print("датчик в воде");
-    lcd.clear();
   }
 }
