@@ -1,6 +1,5 @@
 #include <TroykaMQ.h>
 #include <TroykaButton.h>
-#include <NewPing.h>
 #include <TroykaIMU.h>
 #include <LiquidCrystalRus.h>
 #include <Wire.h>
@@ -8,8 +7,6 @@
 #include <TroykaRTC.h>
 
 #define LEN_TIME 12
-#define TRIGGER_PIN  12
-#define ECHO_PIN     13
 #define PIN_MQ9        A1
 #define PIN_MQ9_HEATER 1
 #define vppin          A0
