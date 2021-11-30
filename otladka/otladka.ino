@@ -1,5 +1,6 @@
 #include <TroykaMQ.h>
 #include <TroykaButton.h>
+#include <NewPing.h>
 #include <TroykaIMU.h>
 #include <LiquidCrystalRus.h>
 #include <Wire.h>
@@ -7,6 +8,7 @@
 #include <TroykaRTC.h>
 
 #define LEN_TIME 12
+
 #define PIN_MQ9        A1
 #define PIN_MQ9_HEATER 1
 #define vppin          A0
@@ -19,14 +21,14 @@ int hum;
 int hour;
 int seconds;
 int minute;
-int mode = 0;
-int max_mode = 1;
+int mode = 1;
+int max_mode = 2;
 int VP;
 
 
 RTC clock;
 Barometer barometer;
-LiquidCrystalRus lcd(12, 10, 11, 5, 4, 3, 2);
+LiquidCrystalRus lcd(11, 10, 5, 4, 3, 2);
 DHT dht(9, DHT11);
 TroykaButton bl(8);
 TroykaButton br(6);
@@ -43,7 +45,8 @@ void setup() {
   barometer.begin();
   bl.begin();
   br.begin();
-   mq9.cycleHeat();
+  mq9.cycleHeat();
+  changeScreenState();
 }
 
 
@@ -55,49 +58,46 @@ void Curs(int weight, int hight)
 
 
 void loop() {
-   INIT(); 
-
-   Screen_State(2);
+   INIT();
+   Screen_State();
    delay(29);
-   changeScreenState();
-  
    
-   delay(29);
 }
 
 
 
-void Screen_State(int getORchange)
+void Screen_State()
 {
-  if(getORchange == 1)
-  {
-    return mode;
-  }
-  else{
-    if(bl.isClick() && mode == 0 || mode != 0 && mode != max_mode )
+ 
+    if(bl.isClick() && mode != max_mode )
   {
     mode++;
     lcd.clear();
+    changeScreenState();
   }
   
   else if (bl.isClick() && mode == max_mode)
   {
-    mode = 0;
+    mode = 1;
     lcd.clear();
+   changeScreenState();
+   
   }
   
-  else if(br.isClick() && mode == max_mode || mode != 0 && mode != 0 )
+  else if(br.isClick() && mode != 1 )
   {
     mode--;
     lcd.clear();
+   changeScreenState();
   }
   
-  else if (bl.isClick() && mode == 0)
+   else if (br.isClick() && mode == 1)
   {
     mode = max_mode;
     lcd.clear();
+    changeScreenState();
   }
-  }
+  
 }
 
 
@@ -105,8 +105,7 @@ void Screen_State(int getORchange)
 
 void changeScreenState()
 {
-  switch(mode){
-    case 0:
+  if(mode == 1){
        Time(1); 
        
        Curs(3,1);
@@ -116,31 +115,35 @@ void changeScreenState()
        Curs(13,1);
        
        Hum();
-       
+      
        Curs(1,2);
        
        Bar();
 
        vp(0,3);
-       
-    case 1:
+       delay(30);
+  }   
+   else if (mode == 2)
+   {
         gas(0,0);
-        delay(29);      
+        delay(30);
+   }
+              
       
   }
-}
+
 
 
 
 void INIT ()
 {
   VP = analogRead(vppin);
-  delay(500);
+  delay(30);
   bar = barometer.readPressureMillimetersHg();
-  delay(500);
+  delay(30);
   temp = dht.getTemperatureC();
    hum = dht.getHumidity();
-  delay(500);
+  delay(10);
   hour = clock.getHour();
   minute = clock.getMinute();
   seconds = clock.getSecond();
@@ -153,13 +156,13 @@ void INIT ()
 
 void Temperature()
 {
-  delay(500);
+  delay(30);
   lcd.print(temp);
   lcd.print("\x99""C"); 
 }
 
 void Bar () {
-  delay(500);
+  delay(30);
   lcd.print(bar);
   lcd.print("мм рт. ст.");
   
@@ -170,7 +173,7 @@ void Bar () {
 
 void Time(int isChangeCurs)
 {
-  delay(500);
+  delay(30);
   if (isChangeCurs == 1)
    { Curs(6,0); }
   lcd.print(hour);
@@ -186,7 +189,7 @@ void Hum ()
 { 
   lcd.print(hum);
   lcd.print("\x25");
-  delay(500);
+  delay(30);
 }
 
 void startScreen()
@@ -237,16 +240,16 @@ void vp (int cur, int cur1){
   if (VP >= 0 && VP <= 300) {
     lcd.setCursor(cur+7,cur1);
     lcd.print("сухая почва");
-    lcd.clear();
+    
   }
   else if (VP >= 300 && VP <= 600){
     lcd.setCursor(cur+7,cur1);
     lcd.print("влажная почва");
-    lcd.clear();
+   
   }
   else if (VP >= 600 && VP <= 750){
     lcd.setCursor(cur+7,cur1);
     lcd.print("датчик в воде");
-    lcd.clear();
+    
   }
 }
