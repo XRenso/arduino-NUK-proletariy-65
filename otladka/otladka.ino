@@ -7,6 +7,7 @@
 #include <TroykaDHT.h>
 #include <TroykaRTC.h>
 
+#define zoomer_pin     12
 #define LEN_TIME 12
 
 #define PIN_MQ9        A1
@@ -18,11 +19,9 @@ char time[LEN_TIME];
 int bar;
 int temp;
 int hum;
-int hour;
-int seconds;
-int minute;
+String timeStr,dateStr,weekDayStr;
 int mode = 1;
-int max_mode = 2;
+int max_mode = 3;
 int VP;
 
 
@@ -37,9 +36,11 @@ MQ9 mq9(PIN_MQ9, PIN_MQ9_HEATER);
 
 
 void setup() {
+  pinMode(zoomer_pin, OUTPUT);
   lcd.begin(20, 4);
   dht.begin();
   clock.begin();
+  pinMode(zoomer_pin, OUTPUT);
   clock.set(__TIMESTAMP__);
   startScreen();
   barometer.begin();
@@ -60,6 +61,7 @@ void Curs(int weight, int hight)
 void loop() {
    INIT();
    Screen_State();
+   changeScreenState();
    delay(29);
    
 }
@@ -72,30 +74,33 @@ void Screen_State()
     if(bl.isClick() && mode != max_mode )
   {
     mode++;
+    tone(zoomer_pin, 500, 100);
     lcd.clear();
-    changeScreenState();
+
   }
   
   else if (bl.isClick() && mode == max_mode)
   {
     mode = 1;
+    tone(zoomer_pin, 500, 100);
     lcd.clear();
-   changeScreenState();
-   
+     
   }
   
   else if(br.isClick() && mode != 1 )
   {
     mode--;
+    tone(zoomer_pin, 500, 100);
     lcd.clear();
-   changeScreenState();
+   
   }
   
    else if (br.isClick() && mode == 1)
   {
     mode = max_mode;
+    tone(zoomer_pin, 500, 100);
     lcd.clear();
-    changeScreenState();
+
   }
   
 }
@@ -108,25 +113,36 @@ void changeScreenState()
   if(mode == 1){
        Time(1); 
        
-       Curs(3,1);
-       
+       Curs(0,3);
        Temperature();
-       
-       Curs(13,1);
-       
-       Hum();
+       Curs(0,0);
+       lcd.print("\x42\x4F\x52\x43\x48");
+       Curs(6,0);
+       lcd.print("Пролетарий-65");
       
-       Curs(1,2);
+      
        
-       Bar();
 
-       vp(0,3);
+      
        delay(30);
   }   
    else if (mode == 2)
    {
         gas(0,0);
+        
+       
+        
         delay(30);
+   }
+   else if(mode == 3)
+
+   {
+    Curs(8,0);
+    Hum();
+    Curs(4,2);
+    Bar();
+     vp(0,3);
+   
    }
               
       
@@ -144,9 +160,7 @@ void INIT ()
   temp = dht.getTemperatureC();
    hum = dht.getHumidity();
   delay(10);
-  hour = clock.getHour();
-  minute = clock.getMinute();
-  seconds = clock.getSecond();
+  clock.getTimeStamp(timeStr, dateStr, weekDayStr);
   clock.read();
   dht.read();
   bl.read();
@@ -164,7 +178,7 @@ void Temperature()
 void Bar () {
   delay(30);
   lcd.print(bar);
-  lcd.print("мм рт. ст.");
+  lcd.print(" мм рт. ст.");
   
 }
 
@@ -174,13 +188,12 @@ void Bar () {
 void Time(int isChangeCurs)
 {
   delay(30);
-  if (isChangeCurs == 1)
-   { Curs(6,0); }
-  lcd.print(hour);
-  lcd.print(":");
-  lcd.print(minute);
-  lcd.print(":");
-  lcd.print(seconds);
+  //if (isChangeCurs == 1)
+  // { Curs(6,0); }
+  Curs(5,2);
+  lcd.print(timeStr);
+  Curs(10,3);
+  lcd.print(dateStr);
 }
 
 
@@ -197,7 +210,12 @@ void startScreen()
   Curs(7, 1);
   lcd.print("\x42\x4F\x52\x43\x48");
   Curs(5, 2);
-  lcd.print("НУК ВЕР. 1");
+  lcd.print("НУК ВЕР. 2");
+  tone(zoomer_pin, 400, 200);
+  delay(200);
+  tone(zoomer_pin, 600, 200);
+  delay(200);
+  tone(zoomer_pin, 800, 200);
   delay(2000);
   lcd.clear();
 }
@@ -237,7 +255,7 @@ void vp (int cur, int cur1){
   lcd.setCursor(cur,cur1);
   lcd.print("ВП:");
   lcd.print(VP);
-  if (VP >= 0 && VP <= 300) {
+  if (VP <= 300) {
     lcd.setCursor(cur+7,cur1);
     lcd.print("сухая почва");
     
