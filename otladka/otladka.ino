@@ -1,6 +1,5 @@
 #include <TroykaMQ.h>
 #include <TroykaButton.h>
-#include <NewPing.h>
 #include <TroykaIMU.h>
 #include <LiquidCrystalRus.h>
 #include <Wire.h>
