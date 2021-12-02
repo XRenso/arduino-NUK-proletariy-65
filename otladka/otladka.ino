@@ -41,7 +41,7 @@ void setup() {
   dht.begin();
   clock.begin();
   pinMode(zoomer_pin, OUTPUT);
-  clock.set(__TIMESTAMP__);
+  //clock.set(__TIMESTAMP__);
   startScreen();
   barometer.begin();
   bl.begin();
